@@ -53,6 +53,13 @@ const SearchBar = () => {
   return null;
 };
 
+const photoIcon = new L.Icon({
+  iconUrl: '/vite.svg',
+  iconSize: [40, 40], // Size of the icon
+  iconAnchor: [20, 40], // Point of the icon which will correspond to marker's location
+  popupAnchor: [0, -40] // Point from which the popup should open relative to the iconAnchor
+});
+
 const MyMap = () => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
@@ -136,7 +143,7 @@ const MyMap = () => {
       <MapContainer center={[51.505, -0.09]} zoom={13} className="map-container">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {markers.map((marker, index) => (
-          <Marker key={index} position={[marker.lat, marker.lng]} eventHandlers={{
+          <Marker key={index} position={[marker.lat, marker.lng]} icon={photoIcon} eventHandlers={{
             click: () => navigate(`/details/${marker.lat}/${marker.lng}`)
           }}>
             <Popup>A view of your images at this location. Click marker to see all.</Popup>
