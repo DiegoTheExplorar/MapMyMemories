@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import L from 'leaflet';
@@ -12,15 +12,14 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { db } from './firebase-config';
-
+import HamburgerMenu from './HamburgerMenu/Hamburger';
 const SearchBar = () => {
   const map = useMap();
 
   useEffect(() => {
     // Define a red marker icon
-    const redIcon = new L.DivIcon({
-      className: 'custom-icon', // Custom class for styling
-      html: '<div style="background-color: red; width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;"></div>', // HTML and CSS for red icon
+    const redIcon = new L.Icon({
+      iconUrl: './redmarker.png', // URL to your custom icon image
       iconSize: [32, 32], // Size of the icon
       iconAnchor: [16, 32], // Anchor point of the icon
       popupAnchor: [0, -32] // Popup anchor relative to the iconAnchor
@@ -54,18 +53,48 @@ const SearchBar = () => {
 };
 
 const photoIcon = new L.Icon({
-  iconUrl: '/vite.svg',
-  iconSize: [40, 40], // Size of the icon
-  iconAnchor: [20, 40], // Point of the icon which will correspond to marker's location
+  iconUrl: './camera.png',
+  iconSize: [20, 20], // Size of the icon
+  iconAnchor: [20, 20], // Point of the icon which will correspond to marker's location
   popupAnchor: [0, -40] // Point from which the popup should open relative to the iconAnchor
 });
 
 const MyMap = () => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
+  const [location, setLocation] = useState({ lat: null, long: null });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchLocations();
+  }, []);
+
+
+
+  const fetchLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            long: position.coords.longitude
+          });
+        },
+        (error) => {
+          setError(error.message);
+          console.error(error);
+        }
+      );
+    } else {
+      setLocation({
+            lat: 1.359167,
+            long:  103.989441
+          });
+    }
+  };
+
+  useEffect(() => {
+    fetchLocation();
   }, []);
 
   const fetchLocations = async () => {
@@ -125,12 +154,6 @@ const MyMap = () => {
     });
   }, []);
 
-  const handleSignOut = async () => {
-    const auth = getAuth();
-    await signOut(auth);
-    navigate('/signin');
-  };
-
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
@@ -139,18 +162,31 @@ const MyMap = () => {
         <input {...getInputProps()} />
         <p>Drag 'n' drop images here, or click to select images</p>
       </div>
-      <button onClick={handleSignOut} className="signout-button">Sign Out</button>
-      <MapContainer center={[51.505, -0.09]} zoom={13} className="map-container">
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {markers.map((marker, index) => (
-          <Marker key={index} position={[marker.lat, marker.lng]} icon={photoIcon} eventHandlers={{
-            click: () => navigate(`/details/${marker.lat}/${marker.lng}`)
-          }}>
-            <Popup>A view of your images at this location. Click marker to see all.</Popup>
-          </Marker>
-        ))}
-        <SearchBar />
-      </MapContainer>
+      {location.lat && location.long && (
+        <MapContainer center={[location.lat, location.long]} zoom={13} className="map-container">
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {markers.map((marker, index) => (
+            <Marker
+            key={index}
+            position={[marker.lat, marker.lng]}
+            icon={photoIcon}
+            eventHandlers={{
+              click: () => navigate(`/details/${marker.lat}/${marker.lng}`),
+              mouseover: (e) => {
+                e.target.openPopup();
+              },
+              mouseout: (e) => {
+                e.target.closePopup();
+              }
+            }}
+          >
+            <Popup>Click the marker to see all images.</Popup>
+          </Marker>          
+          ))}
+          <SearchBar />
+        </MapContainer>
+      )}
+      <HamburgerMenu />
     </div>
   );
 };

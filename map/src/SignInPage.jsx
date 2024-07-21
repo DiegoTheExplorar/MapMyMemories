@@ -11,7 +11,7 @@ const SignInPage = () => {
 
     try {
       await signInWithPopup(auth, provider);
-      navigate('/map');  // Redirects to the map page after successful login
+      navigate('/map'); 
     } catch (error) {
       alert('Failed to sign in with Google: ' + error.message);
     }

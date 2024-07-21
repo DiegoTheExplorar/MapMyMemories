@@ -2,9 +2,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import DetailsPage from './DetailsPage';
+import ImageGallery from './ImageGallery';
 import MyMap from './MyMap';
 import SignInPage from './SignInPage';
-
 const PrivateRoute = ({ element }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,6 +32,7 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/map" element={<PrivateRoute element={<MyMap />} />} />
         <Route path="/details/:lat/:lng" element={<PrivateRoute element={<DetailsPage />} />} />
+        <Route path="/gallery" element={<PrivateRoute element={<ImageGallery />} />} />
       </Routes>
     </Router>
   );

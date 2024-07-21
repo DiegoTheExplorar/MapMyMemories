@@ -10,4 +10,10 @@ html, body {
     flex-direction: column;
     height: 100%;
   }
+
+  h1{
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1em;
+  }
   

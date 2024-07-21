@@ -2,12 +2,15 @@ import { getAuth } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import './DetailsPage.css'; // Import a separate CSS file for styling
 import { db } from './firebase-config';
+
 const DetailsPage = () => {
   const { lat, lng } = useParams();
   const [images, setImages] = useState([]);
   const [currentImage, setCurrentImage] = useState(0);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchImages = async () => {
       const auth = getAuth();
@@ -41,25 +44,25 @@ const DetailsPage = () => {
     setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const toMap = async () => {
+  const toMap = () => {
     navigate('/map');
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+    <div className="container">
       <h1>Images at Latitude: {lat}, Longitude: {lng}</h1>
       {images.length > 0 ? (
-        <div>
-          <img src={images[currentImage]} alt="Slideshow image" style={{ maxWidth: "20%", height: 'auto', display: 'block', margin: 'auto' }} />
-          <div style={{ marginTop: '10px' }}>
-            <button onClick={prevImage} style={{ marginRight: '5px' }}>Previous</button>
+        <div className="image-carousel">
+          <img src={images[currentImage]} alt="Slideshow image" />
+          <div className="carousel-controls">
+            <button onClick={prevImage}>Previous</button>
             <button onClick={nextImage}>Next</button>
           </div>
         </div>
       ) : (
         <p>No images available for this location.</p>
       )}
-      <button onClick={toMap} style={{ marginTop: '10px' }}>Back to Map</button>
+      <button onClick={toMap} className="back-button">Back to Map</button>
     </div>
   );
 };
