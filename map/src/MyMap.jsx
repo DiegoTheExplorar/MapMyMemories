@@ -81,17 +81,22 @@ const MyMap = () => {
           });
         },
         (error) => {
-          setError(error.message);
+          setError("Unable to retrieve your location. Please enable location permissions.");
           console.error(error);
+          setLocation({
+            lat: 1.359167,
+            long: 103.989441
+          });
         }
       );
     } else {
       setLocation({
-            lat: 1.359167,
-            long:  103.989441
-          });
+        lat: 1.359167,
+        long: 103.989441
+      });
     }
   };
+  
 
   useEffect(() => {
     fetchLocation();
