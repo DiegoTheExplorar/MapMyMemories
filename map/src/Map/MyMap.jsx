@@ -25,7 +25,7 @@ const photoIcon = new L.Icon({
 const MyMap = () => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
-  const [location, setLocation] = useState({ lat: null, long: null });
+  const [location, setLocation] = useState({ lat:null, long: null });
   const [error, setError] = useState('');
 
   useEffect(() => {
