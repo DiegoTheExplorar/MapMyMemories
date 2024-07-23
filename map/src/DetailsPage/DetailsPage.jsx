@@ -2,8 +2,8 @@ import { getAuth } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { db } from '../firebase-config';
 import './DetailsPage.css'; // Import a separate CSS file for styling
-import { db } from './firebase-config';
 
 const DetailsPage = () => {
   const { lat, lng } = useParams();

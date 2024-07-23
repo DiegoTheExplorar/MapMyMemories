@@ -1,9 +1,9 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import DetailsPage from './DetailsPage';
-import ImageGallery from './ImageGallery';
-import MyMap from './MyMap';
+import DetailsPage from './DetailsPage/DetailsPage';
+import ImageGallery from './ImageGallery/ImageGallery';
+import MyMap from './Map/MyMap';
 import SignInPage from './SignInPage';
 const PrivateRoute = ({ element }) => {
   const [user, setUser] = useState(null);

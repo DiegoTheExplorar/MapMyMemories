@@ -1,7 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import './SignInPage.css';
 const SignInPage = () => {
   const navigate = useNavigate();
 
