@@ -2,8 +2,7 @@ import { getAuth } from 'firebase/auth';
 import { collection, getDocs, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase-config';
-import './ImageGallery.css'; // Import the CSS for styling
-
+import './ImageGallery.css';
 const ImageGallery = () => {
     const [images, setImages] = useState([]);
     const auth = getAuth();

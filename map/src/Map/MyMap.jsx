@@ -14,7 +14,6 @@ import HamburgerMenu from '../HamburgerMenu/Hamburger';
 import './MyMap.css';
 import SearchBar from './SearchBar';
 
-
 const photoIcon = new L.Icon({
   iconUrl: './camera.png',
   iconSize: [20, 20], // Size of the icon
@@ -25,14 +24,12 @@ const photoIcon = new L.Icon({
 const MyMap = () => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
-  const [location, setLocation] = useState({ lat:null, long: null });
+  const [location, setLocation] = useState({ lat: null, long: null });
   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchLocations();
   }, []);
-
-
 
   const fetchLocation = () => {
     if (navigator.geolocation) {
@@ -59,7 +56,6 @@ const MyMap = () => {
       });
     }
   };
-  
 
   useEffect(() => {
     fetchLocation();
@@ -80,6 +76,21 @@ const MyMap = () => {
         images: doc.data().images
       }));
       setMarkers(fetchedMarkers);
+    }
+  };
+
+  const getCountry = async (lat, long) => {
+    try {
+      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${lat}%2C${long}&key=${import.meta.env.VITE_OPENCAGE_API_KEY}`);
+      const results = response.data.results; // Access the results array
+      if (results.length > 0) {
+        const country = results[0].components.country; // Access the country field
+        return country;
+      }
+      return null; // Return null if no results are found
+    } catch (error) {
+      console.error('Error fetching country:', error);
+      return null; // Return null in case of an error
     }
   };
 
@@ -104,6 +115,7 @@ const MyMap = () => {
       const locationsRef = collection(userDocRef, "locations");
       const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
       const locQuerySnapshot = await getDocs(locQuery);
+      const country = await getCountry(latitude, longitude); // Await the country value here
       if (!locQuerySnapshot.empty) {
         const locDoc = locQuerySnapshot.docs[0];
         await updateDoc(doc(locationsRef, locDoc.id), {
@@ -114,7 +126,8 @@ const MyMap = () => {
           latitude,
           longitude,
           images: [downloadURL],
-          timestamp: new Date()
+          timestamp: new Date().getTime(),
+          country // Use the awaited country value here
         });
       }
       alert('Image successfully added!');
@@ -135,21 +148,21 @@ const MyMap = () => {
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {markers.map((marker, index) => (
             <Marker
-            key={index}
-            position={[marker.lat, marker.lng]}
-            icon={photoIcon}
-            eventHandlers={{
-              click: () => navigate(`/details/${marker.lat}/${marker.lng}`),
-              mouseover: (e) => {
-                e.target.openPopup();
-              },
-              mouseout: (e) => {
-                e.target.closePopup();
-              }
-            }}
-          >
-            <Popup>Click the marker to see all images.</Popup>
-          </Marker>          
+              key={index}
+              position={[marker.lat, marker.lng]}
+              icon={photoIcon}
+              eventHandlers={{
+                click: () => navigate(`/details/${marker.lat}/${marker.lng}`),
+                mouseover: (e) => {
+                  e.target.openPopup();
+                },
+                mouseout: (e) => {
+                  e.target.closePopup();
+                }
+              }}
+            >
+              <Popup>Click the marker to see all images.</Popup>
+            </Marker>
           ))}
           <SearchBar />
         </MapContainer>
