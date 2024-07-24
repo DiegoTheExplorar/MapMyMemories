@@ -82,10 +82,11 @@ const MyMap = () => {
   const getCountry = async (lat, long) => {
     try {
       const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${lat}%2C${long}&key=${import.meta.env.VITE_OPENCAGE_API_KEY}`);
-      const results = response.data.results; // Access the results array
+      const results = response.data.results; 
       if (results.length > 0) {
-        const country = results[0].components.country; // Access the country field
-        return country;
+        const country = results[0].components.country; 
+        const address = results[0].formatted;
+        return {country,address}; // Return the country and address
       }
       return null; // Return null if no results are found
     } catch (error) {
@@ -107,15 +108,18 @@ const MyMap = () => {
       formData.append('file', file);
       const response = await axios.post('https://travelphoto-4c6a27f33f4a.herokuapp.com/upload', formData);
       const { latitude, longitude } = response.data;
+      console.log('Got coords')
       const storage = getStorage();
       const storageRef = ref(storage, `images/${userId}/${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
+      console.log('Got the image URL and uploaded to storage')
       const userDocRef = doc(db, "users", userId);
       const locationsRef = collection(userDocRef, "locations");
       const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
       const locQuerySnapshot = await getDocs(locQuery);
-      const country = await getCountry(latitude, longitude); // Await the country value here
+      const {country,address} = await getCountry(latitude, longitude);
+      console.log(country) // Await the country value here
       if (!locQuerySnapshot.empty) {
         const locDoc = locQuerySnapshot.docs[0];
         await updateDoc(doc(locationsRef, locDoc.id), {
@@ -127,7 +131,8 @@ const MyMap = () => {
           longitude,
           images: [downloadURL],
           timestamp: new Date().getTime(),
-          country // Use the awaited country value here
+          country,
+          address
         });
       }
       alert('Image successfully added!');

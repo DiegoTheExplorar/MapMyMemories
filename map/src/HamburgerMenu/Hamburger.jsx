@@ -1,4 +1,4 @@
-import { faHome, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faHome, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
@@ -61,6 +61,9 @@ const HamburgerMenu = () => {
         </button>
         <button onClick={() => { navigate('/gallery'); closeMenu(); }}>
           <FontAwesomeIcon icon={faImage} /> View Gallery
+        </button>
+        <button onClick={() => { navigate('/country'); closeMenu(); }}>
+          <FontAwesomeIcon icon={faGlobe} /> View Images by Country
         </button>
         {profilePicUrl && (
           <div className="profile-container">

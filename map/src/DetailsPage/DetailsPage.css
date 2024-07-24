@@ -1,50 +1,76 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f4f4f4;
-    padding: 20px;
-  }
-  
-  .image-carousel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  img {
-    max-width: 100%; /* Ensure the image is responsive and does not exceed its parent's width */
-    height: 303px; /* Set the height to roughly 8cm on a typical screen */
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    object-fit: cover; /* Ensures the image covers the set height and width, may crop if necessary */
-  }
-  
-  
-  .carousel-controls {
-    display: flex;
-    margin-top: 10px;
-  }
-  
-  button {
-    padding: 8px 16px;
-    margin: 0 5px;
-    border: none;
-    background-color: #007BFF;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .back-button {
-    margin-top: 20px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+.image-carousel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Needed for positioning controls */
+}
+
+img {
+  max-width: 100%; /* Ensure the image is responsive and does not exceed its parent's width */
+  height: 303px; /* Set the height to roughly 8cm on a typical screen */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  object-fit: cover; /* Ensures the image covers the set height and width, may crop if necessary */
+}
+
+.carousel-controls {
+  display: flex;
+  margin-top: 10px;
+}
+
+button {
+  padding: 8px 16px;
+  margin: 0 5px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px; 
+}
+
+.spinner {
+  border: 8px solid #f3f3f3; 
+  border-top: 8px solid #007BFF; 
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header styles */
+.header {
+  position: absolute; 
+  top: 10px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px; 
+  font-size: 2.5em;
+}

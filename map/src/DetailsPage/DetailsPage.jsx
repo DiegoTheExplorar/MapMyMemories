@@ -3,12 +3,13 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../firebase-config';
-import './DetailsPage.css'; // Import a separate CSS file for styling
+import './DetailsPage.css';
 
 const DetailsPage = () => {
   const { lat, lng } = useParams();
   const [images, setImages] = useState([]);
   const [currentImage, setCurrentImage] = useState(0);
+  const [address, setAddress] = useState('Address not found');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const DetailsPage = () => {
         if (!querySnapshot.empty) {
           const allImages = querySnapshot.docs.flatMap(doc => doc.data().images);
           setImages(allImages);
+          setAddress(querySnapshot.docs[0].data().address || 'Address not found');
         } else {
           console.log("No images found at this location.");
         }
@@ -44,25 +46,24 @@ const DetailsPage = () => {
     setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const toMap = () => {
-    navigate('/map');
-  };
-
   return (
     <div className="container">
-      <h1>Images at Latitude: {lat}, Longitude: {lng}</h1>
+      <h1 className="header">Images at {address}</h1>
       {images.length > 0 ? (
         <div className="image-carousel">
-          <img src={images[currentImage]} alt="Slideshow image" />
-          <div className="carousel-controls">
-            <button onClick={prevImage}>Previous</button>
-            <button onClick={nextImage}>Next</button>
-          </div>
+          <img src={images[currentImage]} alt="Slideshow" />
+          {images.length > 1 && (
+            <div className="carousel-controls">
+              <button onClick={prevImage}>Previous</button>
+              <button onClick={nextImage}>Next</button>
+            </div>
+          )}
         </div>
       ) : (
-        <p>No images available for this location.</p>
+        <div className="loading-container">
+          <div className="spinner"></div>
+        </div>
       )}
-      <button onClick={toMap} className="back-button">Back to Map</button>
     </div>
   );
 };
