@@ -1,38 +1,38 @@
 .app-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%;
-    background: white;
-  }
-  
-  .map-container {
-    height: 75vh;
-    width: 80%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .dropzone {
-    border: 2px dashed #007bff;
-    padding: 20px;
-    text-align: center;
-    margin: 20px auto;
-    cursor: pointer;
-    background-color: #ffffff;
-    border-radius: 5px;
-    color: #007bff;
-    transition: background-color 0.2s;
-    width: 70%;
-  }
-  
-  .dropzone:hover {
-    background-color: #e2e6ea;
-  }
-  @media (max-width: 600px) {
-    .map-container {
-      height: 50vh;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Use 100vh to ensure it covers the full viewport height */
+  color: white; /* Optional: Change text color to white for contrast */
 }
-  
+
+.map-container {
+  height: 75vh;
+  width: 80%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.dropzone {
+  border: 2px dashed #007bff;
+  padding: 20px;
+  text-align: center;
+  margin: 20px auto;
+  cursor: pointer;
+  background-color: #ffffff; /* Background color of the dropzone */
+  border-radius: 5px;
+  color: #007bff;
+  transition: background-color 0.2s;
+  width: 70%;
+}
+
+.dropzone:hover {
+  background-color: #e2e6ea;
+}
+
+@media (max-width: 600px) {
+  .map-container {
+      height: 50vh;
+  }
+}

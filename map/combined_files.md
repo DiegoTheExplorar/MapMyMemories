@@ -610,7 +610,6 @@ import './SignInPage.css';
 const SignInPage = () => {
   const navigate = useNavigate();
   
-
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
@@ -624,12 +623,26 @@ const SignInPage = () => {
   };
 
   return (
+    <div>
+      <div className="message">
+        <p className="text">Welcome to MapMyMemories!</p>
+        <p className="text">Discover and remember your favorite places with ease.</p>
+      </div>
+      <footer className="credits">
+        <span id="credit1">
+          Photo by <a href="https://stocksnap.io/photo/sunrise-sunset-XSTO5645BM">Jordan McQueen</a> on <a href="https://stocksnap.io">StockSnap</a>
+        </span>
+        <span id="credit2" style={{ display: 'none' }}>
+          Photo by <a href="https://stocksnap.io/photo/city-tourist-OPR16B55Q8">Matt Moloney</a> on <a href="https://stocksnap.io">StockSnap</a>
+        </span>
+      </footer>
       <button 
-        onClick={handleGoogleSignIn} 
-        className={`login-button`}
-      >
-        Login
-      </button>
+          onClick={handleGoogleSignIn} 
+          className={`login-button`}
+        >
+          Login
+        </button>
+    </div>
   );
 };
 
@@ -997,55 +1010,147 @@ html, body {
 ### src\Map\MyMap.css
 ```css
 .app-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%;
-    background: white;
-  }
-  
-  .map-container {
-    height: 75vh;
-    width: 80%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .dropzone {
-    border: 2px dashed #007bff;
-    padding: 20px;
-    text-align: center;
-    margin: 20px auto;
-    cursor: pointer;
-    background-color: #ffffff;
-    border-radius: 5px;
-    color: #007bff;
-    transition: background-color 0.2s;
-    width: 70%;
-  }
-  
-  .dropzone:hover {
-    background-color: #e2e6ea;
-  }
-  @media (max-width: 600px) {
-    .map-container {
-      height: 50vh;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Use 100vh to ensure it covers the full viewport height */
+  background: black; /* Set background to black */
+  color: white; /* Optional: Change text color to white for contrast */
 }
-  
+
+.map-container {
+  height: 75vh;
+  width: 80%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.dropzone {
+  border: 2px dashed #007bff;
+  padding: 20px;
+  text-align: center;
+  margin: 20px auto;
+  cursor: pointer;
+  background-color: #ffffff; /* Background color of the dropzone */
+  border-radius: 5px;
+  color: #007bff;
+  transition: background-color 0.2s;
+  width: 70%;
+}
+
+.dropzone:hover {
+  background-color: #e2e6ea;
+}
+
+@media (max-width: 600px) {
+  .map-container {
+      height: 50vh;
+  }
+}
+
 ```
 
 ### src\SignInPage.css
 ```css
+/* SignInPage.css */
+@keyframes backgroundCycle {
+  0% { 
+    background-image: url('/photo1.jpg'); 
+  }
+  50% { 
+    background-image: url('/photo2.jpg'); 
+  }
+  100% { 
+    background-image: url('/photo1.jpg'); 
+  }
+}
+
+@keyframes creditsCycle {
+  0%, 100% { 
+    opacity: 0; 
+  }
+  10% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  animation: backgroundCycle 15s infinite; /* Adjust duration as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Style for the central message */
+.message {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  width: 80%;
+  transform: translate(-50%, -50%);
+  color:rgb(3, 3, 3);
+  background-color: black;
+  background: rgba(230, 216, 216, 0.086); 
+  font-size: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  font-family: 'Arial', sans-serif;
+  font-size: 30px;
+
+}
 .login-button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: black;
   border-radius: 5px;
   position: absolute; 
   top: 10px; 
   right: 10px; 
   width: auto; 
+}
+
+/* Style for credits */
+.credits {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 12px;
+  color: #fff; /* Adjust color for visibility */
+  background: rgba(0, 0, 0, 0.5); /* Optional: Add background for better readability */
+  padding: 5px;
+  border-radius: 5px;
+  animation: creditsCycle 15s infinite; /* Same duration as backgroundCycle */
+}
+
+#credit1 {
+  opacity: 1; /* Visible during the first half of the cycle */
+}
+
+#credit2 {
+  opacity: 0; /* Hidden during the first half, visible during the second half */
 }
 
 ```
