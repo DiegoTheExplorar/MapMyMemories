@@ -1,4 +1,4 @@
-import { faGlobe, faHome, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
@@ -50,9 +50,6 @@ const HamburgerMenu = () => {
         &#9776;
       </div>
       <div className={`menu ${isOpen ? 'open' : ''}`}>
-        <button onClick={() => { navigate('/map'); closeMenu(); }}>
-          <FontAwesomeIcon icon={faHome} /> Home
-        </button>
         <button onClick={() => { navigate('/map'); closeMenu(); }}>
           <FontAwesomeIcon icon={faMap} /> Map
         </button>

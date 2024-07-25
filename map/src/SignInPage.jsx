@@ -1,7 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './SignInPage.module.css'; // Correct import for CSS Module
+import styles from './SignInPage.module.css';
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -19,28 +19,17 @@ const SignInPage = () => {
   };
 
   return (
-    <div>
-    <div className={styles.bodyBackground}>
-      <div className={styles.message}>
-        <p>Welcome to MapMyMemories!</p>
-        <p>Discover and remember your favorite places with ease.</p>
+    <div className={styles.container}>
+      <div className={styles.imageSection}></div>
+      <div className={styles.formSection}>
+        <div className={styles.message}>
+          <p>Welcome to MapMyMemories!</p>
+          <p>Discover and remember your favorite places with ease.</p>
+        </div>
+        <button onClick={handleGoogleSignIn} className={styles.signin}>
+          Sign in with Google
+        </button>
       </div>
-      <footer className={styles.credits}>
-        Photo credits: <a href="https://stocksnap.io/photo/sunrise-sunset-XSTO5645BM">Jordan McQueen</a> and <a href="https://stocksnap.io/photo/city-tourist-OPR16B55Q8">Matt Moloney</a>
-      </footer>
-    </div>
-    <div>
-      <button 
-        onClick={handleGoogleSignIn} 
-        className={styles.signin}
-      >
-        <img 
-          src="/google.webp" 
-          alt="Sign In with Google" 
-          className={styles.signinImage}
-        />
-      </button>
-    </div>
     </div>
   );
 };

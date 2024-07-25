@@ -18,10 +18,10 @@
 }
 
 .details-image {
-  max-width: 20%; /* Smaller image size */
+  max-width: 20%;
   height: auto;
   display: block;
-  margin: auto; /* Ensures centering */
+  margin: auto; 
 }
 
 .details-nav {

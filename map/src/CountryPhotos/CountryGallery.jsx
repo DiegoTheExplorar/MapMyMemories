@@ -25,7 +25,7 @@ const CountryGallery = () => {
   return (
     <div>
       <div className='option-box'>
-        <label>Choose a country:</label>
+        <label className='label'>Choose a country:</label>
         <select id="dropdown" value={selectedOption} onChange={handleChange}>
           <option value="" disabled>Select an option</option>
           {options.map((option, index) => (

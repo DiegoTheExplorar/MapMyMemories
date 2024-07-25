@@ -3,8 +3,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Use 100vh to ensure it covers the full viewport height */
-  color: white; /* Optional: Change text color to white for contrast */
+  min-height: 100vh; 
+  color: white; 
 }
 
 .map-container {
@@ -20,7 +20,7 @@
   text-align: center;
   margin: 20px auto;
   cursor: pointer;
-  background-color: #ffffff; /* Background color of the dropzone */
+  background-color: #ffffff; 
   border-radius: 5px;
   color: #007bff;
   transition: background-color 0.2s;

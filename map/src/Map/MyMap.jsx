@@ -16,9 +16,9 @@ import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
   iconUrl: './camera.png',
-  iconSize: [20, 20], // Size of the icon
-  iconAnchor: [20, 20], // Point of the icon which will correspond to marker's location
-  popupAnchor: [0, -40] // Point from which the popup should open relative to the iconAnchor
+  iconSize: [20, 20], 
+  iconAnchor: [20, 20], 
+  popupAnchor: [0, -40] 
 });
 
 const MyMap = () => {
@@ -86,12 +86,12 @@ const MyMap = () => {
       if (results.length > 0) {
         const country = results[0].components.country; 
         const address = results[0].formatted;
-        return {country,address}; // Return the country and address
+        return {country,address}; 
       }
-      return null; // Return null if no results are found
+      return null; 
     } catch (error) {
       console.error('Error fetching country:', error);
-      return null; // Return null in case of an error
+      return null;
     }
   };
 
@@ -119,7 +119,7 @@ const MyMap = () => {
       const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
       const locQuerySnapshot = await getDocs(locQuery);
       const {country,address} = await getCountry(latitude, longitude);
-      console.log(country) // Await the country value here
+      console.log(country) 
       if (!locQuerySnapshot.empty) {
         const locDoc = locQuerySnapshot.docs[0];
         await updateDoc(doc(locationsRef, locDoc.id), {
@@ -136,7 +136,7 @@ const MyMap = () => {
         });
       }
       alert('Image successfully added!');
-      fetchLocations(); // Refresh markers
+      fetchLocations(); 
     });
   }, []);
 
