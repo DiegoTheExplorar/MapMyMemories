@@ -12,7 +12,7 @@ import DetailsPage from './DetailsPage/DetailsPage';
 import ImageGallery from './ImageGallery/ImageGallery';
 import MainLayout from './MainLayout';
 import MyMap from './Map/MyMap';
-import SignInPage from './SignInPage';
+import SignInPage from './SigninPage/SignInPage';
 
 function RouterAwareComponent() {
   const location = useLocation();
@@ -77,7 +77,7 @@ export default App;
 ### src\CountryPhotos\CountryGallery.jsx
 ```jsx
 import React, { useEffect, useState } from 'react';
-import { fetchEntriesByCountry, fetchUniqueCountries } from '../firebasehelper';
+import { fetchEntriesByCountry, fetchUniqueCountries } from '../Firebase/firebasehelper';
 import './CountryGallery.css';
 const CountryGallery = () => {
   const [selectedOption, setSelectedOption] = useState('');
@@ -103,7 +103,7 @@ const CountryGallery = () => {
   return (
     <div>
       <div className='option-box'>
-        <label>Choose a country:</label>
+        <label className='label'>Choose a country:</label>
         <select id="dropdown" value={selectedOption} onChange={handleChange}>
           <option value="" disabled>Select an option</option>
           {options.map((option, index) => (
@@ -132,11 +132,9 @@ export default CountryGallery;
 
 ### src\DetailsPage\DetailsPage.jsx
 ```jsx
-import { getAuth } from 'firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { db } from '../firebase-config';
+import { fetchImagesByLocation } from '../Firebase/firebasehelper';
 import './DetailsPage.css';
 
 const DetailsPage = () => {
@@ -148,25 +146,9 @@ const DetailsPage = () => {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (user) {
-        const userId = user.uid;
-        const userDocRef = collection(db, `users/${userId}/locations`);
-        const latNum = parseFloat(lat);
-        const lngNum = parseFloat(lng);
-        const q = query(userDocRef, where("latitude", "==", latNum), where("longitude", "==", lngNum));
-
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const allImages = querySnapshot.docs.flatMap(doc => doc.data().images);
-          setImages(allImages);
-          setAddress(querySnapshot.docs[0].data().address || 'Address not found');
-        } else {
-          console.log("No images found at this location.");
-        }
-      }
+      const { allImages, address } = await fetchImagesByLocation(lat, lng);
+      setImages(allImages);
+      setAddress(address);
     };
 
     fetchImages();
@@ -208,7 +190,7 @@ export default DetailsPage;
 
 ### src\HamburgerMenu\Hamburger.jsx
 ```jsx
-import { faGlobe, faHome, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
@@ -261,9 +243,6 @@ const HamburgerMenu = () => {
       </div>
       <div className={`menu ${isOpen ? 'open' : ''}`}>
         <button onClick={() => { navigate('/map'); closeMenu(); }}>
-          <FontAwesomeIcon icon={faHome} /> Home
-        </button>
-        <button onClick={() => { navigate('/map'); closeMenu(); }}>
           <FontAwesomeIcon icon={faMap} /> Map
         </button>
         <button className="sign-out-button" onClick={() => { handleSignOut(); closeMenu(); }}>
@@ -291,26 +270,17 @@ export default HamburgerMenu;
 
 ### src\ImageGallery\ImageGallery.jsx
 ```jsx
-import { getAuth } from 'firebase/auth';
-import { collection, getDocs, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase-config';
+import { fetchUserImages } from '../Firebase/firebasehelper';
 import './ImageGallery.css';
+
 const ImageGallery = () => {
     const [images, setImages] = useState([]);
-    const auth = getAuth();
 
     useEffect(() => {
         const fetchImages = async () => {
-            const user = auth.currentUser;
-            if (user) {
-                const userId = user.uid;
-                const userDocRef = collection(db, `users/${userId}/locations`);
-                const q = query(userDocRef);
-                const querySnapshot = await getDocs(q);
-                const allImages = querySnapshot.docs.flatMap(doc => doc.data().images);
-                setImages(allImages);
-            }
+            const allImages = await fetchUserImages();
+            setImages(allImages);
         };
 
         fetchImages();
@@ -368,10 +338,6 @@ export default MainLayout;
 
 ### src\Map\MyMap.jsx
 ```jsx
-import axios from 'axios';
-import { getAuth } from 'firebase/auth';
-import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import L from 'leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet/dist/leaflet.css';
@@ -379,16 +345,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase-config';
+import * as firebaseOperations from '../Firebase/firebasehelper';
 import HamburgerMenu from '../HamburgerMenu/Hamburger';
 import './MyMap.css';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
   iconUrl: './camera.png',
-  iconSize: [20, 20], // Size of the icon
-  iconAnchor: [20, 20], // Point of the icon which will correspond to marker's location
-  popupAnchor: [0, -40] // Point from which the popup should open relative to the iconAnchor
+  iconSize: [20, 20],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -40]
 });
 
 const MyMap = () => {
@@ -397,11 +363,7 @@ const MyMap = () => {
   const [location, setLocation] = useState({ lat: null, long: null });
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchLocations();
-  }, []);
-
-  const fetchLocation = () => {
+  const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -427,88 +389,21 @@ const MyMap = () => {
     }
   };
 
-  useEffect(() => {
-    fetchLocation();
+  const fetchLocations = useCallback(async () => {
+    const fetchedMarkers = await firebaseOperations.fetchLocations();
+    setMarkers(fetchedMarkers);
   }, []);
 
-  const fetchLocations = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      const userId = user.uid;
-      const userDocRef = doc(db, "users", userId);
-      const locationsRef = collection(userDocRef, "locations");
-      const querySnapshot = await getDocs(locationsRef);
-      const fetchedMarkers = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        lat: doc.data().latitude,
-        lng: doc.data().longitude,
-        images: doc.data().images
-      }));
-      setMarkers(fetchedMarkers);
-    }
-  };
-
-  const getCountry = async (lat, long) => {
-    try {
-      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${lat}%2C${long}&key=${import.meta.env.VITE_OPENCAGE_API_KEY}`);
-      const results = response.data.results; 
-      if (results.length > 0) {
-        const country = results[0].components.country; 
-        const address = results[0].formatted;
-        return {country,address}; // Return the country and address
-      }
-      return null; // Return null if no results are found
-    } catch (error) {
-      console.error('Error fetching country:', error);
-      return null; // Return null in case of an error
-    }
-  };
+  useEffect(() => {
+    fetchCurrentLocation();
+    fetchLocations();
+  }, [fetchLocations]);
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Please sign in to upload images.");
-      return;
-    }
-    const userId = user.uid;
     acceptedFiles.forEach(async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await axios.post('https://travelphoto-4c6a27f33f4a.herokuapp.com/upload', formData);
-      const { latitude, longitude } = response.data;
-      console.log('Got coords')
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${userId}/${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('Got the image URL and uploaded to storage')
-      const userDocRef = doc(db, "users", userId);
-      const locationsRef = collection(userDocRef, "locations");
-      const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
-      const locQuerySnapshot = await getDocs(locQuery);
-      const {country,address} = await getCountry(latitude, longitude);
-      console.log(country) // Await the country value here
-      if (!locQuerySnapshot.empty) {
-        const locDoc = locQuerySnapshot.docs[0];
-        await updateDoc(doc(locationsRef, locDoc.id), {
-          images: arrayUnion(downloadURL)
-        });
-      } else {
-        await addDoc(locationsRef, {
-          latitude,
-          longitude,
-          images: [downloadURL],
-          timestamp: new Date().getTime(),
-          country,
-          address
-        });
-      }
-      alert('Image successfully added!');
-      fetchLocations(); // Refresh markers
+      await firebaseOperations.uploadImageAndFetchLocations(file, firebaseOperations.getCountry, fetchLocations);
     });
-  }, []);
+  }, [fetchLocations]);
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
@@ -601,11 +496,12 @@ const SearchBar = () => {
 export default SearchBar;
 ```
 
-### src\SignInPage.jsx
+### src\SigninPage\SignInPage.jsx
 ```jsx
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './SignInPage.css';
+import styles from './SignInPage.module.css';
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -623,51 +519,22 @@ const SignInPage = () => {
   };
 
   return (
-    <div>
-      <div className="message">
-        <p className="text">Welcome to MapMyMemories!</p>
-        <p className="text">Discover and remember your favorite places with ease.</p>
-      </div>
-      <footer className="credits">
-        <span id="credit1">
-          Photo by <a href="https://stocksnap.io/photo/sunrise-sunset-XSTO5645BM">Jordan McQueen</a> on <a href="https://stocksnap.io">StockSnap</a>
-        </span>
-        <span id="credit2" style={{ display: 'none' }}>
-          Photo by <a href="https://stocksnap.io/photo/city-tourist-OPR16B55Q8">Matt Moloney</a> on <a href="https://stocksnap.io">StockSnap</a>
-        </span>
-      </footer>
-      <button 
-          onClick={handleGoogleSignIn} 
-          className={`login-button`}
-        >
-          Login
+    <div className={styles.container}>
+      <div className={styles.imageSection}></div>
+      <div className={styles.formSection}>
+        <div className={styles.message}>
+          <p>Welcome to MapMyMemories!</p>
+          <p>Discover and remember your favorite places with ease.</p>
+        </div>
+        <button onClick={handleGoogleSignIn} className={styles.signin}>
+          Sign in with Google
         </button>
+      </div>
     </div>
   );
 };
 
 export default SignInPage;
-
-```
-
-### src\TestPage.jsx
-```jsx
-import React from 'react';
-import { useParams } from 'react-router-dom';
-
-const TestPage = () => {
-  const { lat, lng } = useParams();
-
-  return (
-    <div>
-      <h1>Test Page</h1>
-      <p>Latitude: {lat}</p>
-      <p>Longitude: {lng}</p>
-    </div>
-  );
-};
-
-export default TestPage;
 
 ```
 
@@ -695,10 +562,10 @@ export default TestPage;
 }
 
 .details-image {
-  max-width: 20%; /* Smaller image size */
+  max-width: 20%;
   height: auto;
   display: block;
-  margin: auto; /* Ensures centering */
+  margin: auto; 
 }
 
 .details-nav {
@@ -718,35 +585,75 @@ export default TestPage;
 
 ### src\CountryPhotos\CountryGallery.css
 ```css
-/* CountryGallery.css */
-
 .option-box {
-    display: flex;
-    justify-content: center;
-    margin: 20px;
-  }
-  
-  .option-box select {
-    width: 200px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  
-  .gallery-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-gap: 10px;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.option-box select {
+  width: 250px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #007BFF; 
+  background-color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.option-box select:hover,
+.option-box select:focus {
+  border-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.label{
+  color: azure;
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 15px;
+  padding: 20px;
+}
+
+.image-item {
+  overflow: hidden; 
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
 .image-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    transition: transform 0.3s ease-in-out;
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-in-out;
 }
+
+.image-item img:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .option-box select {
+    width: 100%;
+  }
+  
+  .gallery-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
 ```
 
 ### src\DetailsPage\DetailsPage.css
@@ -766,15 +673,15 @@ export default TestPage;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative; /* Needed for positioning controls */
+  position: relative; 
 }
 
 img {
-  max-width: 100%; /* Ensure the image is responsive and does not exceed its parent's width */
-  height: 303px; /* Set the height to roughly 8cm on a typical screen */
+  max-width: 100%;
+  height: 303px; 
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  object-fit: cover; /* Ensures the image covers the set height and width, may crop if necessary */
+  object-fit: cover;
 }
 
 .carousel-controls {
@@ -913,6 +820,7 @@ body {
   .username {
     font-size: 20px;
     color: #818181;
+    margin-bottom: 20%;
   }
   
   @media (max-width: 768px) {
@@ -991,6 +899,7 @@ html, body {
     padding: 0;
     height: 100%;
     font-family: 'Arial', sans-serif;
+    background-color: rgb(65, 65, 65)
   }
   
   #root {
@@ -1014,9 +923,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Use 100vh to ensure it covers the full viewport height */
-  background: black; /* Set background to black */
-  color: white; /* Optional: Change text color to white for contrast */
+  min-height: 100vh; 
+  color: white; 
 }
 
 .map-container {
@@ -1032,7 +940,7 @@ html, body {
   text-align: center;
   margin: 20px auto;
   cursor: pointer;
-  background-color: #ffffff; /* Background color of the dropzone */
+  background-color: #ffffff; 
   border-radius: 5px;
   color: #007bff;
   transition: background-color 0.2s;
@@ -1051,106 +959,62 @@ html, body {
 
 ```
 
-### src\SignInPage.css
+### src\SigninPage\SignInPage.module.css
 ```css
-/* SignInPage.css */
-@keyframes backgroundCycle {
-  0% { 
-    background-image: url('/photo1.jpg'); 
-  }
-  50% { 
-    background-image: url('/photo2.jpg'); 
-  }
-  100% { 
-    background-image: url('/photo1.jpg'); 
-  }
-}
-
-@keyframes creditsCycle {
-  0%, 100% { 
-    opacity: 0; 
-  }
-  10% {
-    opacity: 1;
-  }
-  25% {
-    opacity: 1;
-  }
-  35% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0;
-  }
-  60% {
-    opacity: 1;
-  }
-  75% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 0;
-  }
-}
-
-body {
-  margin: 0;
+.container {
+  display: flex;
   height: 100vh;
+  width: 100vw;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.imageSection {
+  flex: 2;
+  animation: backgroundCycle 10s infinite alternate;
   background-size: cover;
   background-position: center;
-  animation: backgroundCycle 15s infinite; /* Adjust duration as needed */
+}
+
+@keyframes backgroundCycle {
+  0%, 100% {
+    background-image: url('/photo1.jpg');
+  }
+  50% {
+    background-image: url('/photo2.jpg');
+  }
+}
+
+.formSection {
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-}
-
-/* Style for the central message */
-.message {
-  position: absolute;
-  top: 35%;
-  left: 50%;
-  width: 80%;
-  transform: translate(-50%, -50%);
-  color:rgb(3, 3, 3);
-  background-color: black;
-  background: rgba(230, 216, 216, 0.086); 
-  font-size: 24px;
+  background: rgba(8, 10, 51, 0.85);
   padding: 20px;
-  border-radius: 10px;
-  font-family: 'Arial', sans-serif;
-  font-size: 30px;
-
 }
-.login-button {
+
+.message {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #f1f1f1;
+  font-size: larger;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.signin {
+  background-color: #272726;
+  color: white;
+  border: none;
+  border-radius: 4px;
   padding: 10px 20px;
-  background-color: black;
-  border-radius: 5px;
-  position: absolute; 
-  top: 10px; 
-  right: 10px; 
-  width: auto; 
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-/* Style for credits */
-.credits {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  font-size: 12px;
-  color: #fff; /* Adjust color for visibility */
-  background: rgba(0, 0, 0, 0.5); /* Optional: Add background for better readability */
-  padding: 5px;
-  border-radius: 5px;
-  animation: creditsCycle 15s infinite; /* Same duration as backgroundCycle */
-}
-
-#credit1 {
-  opacity: 1; /* Visible during the first half of the cycle */
-}
-
-#credit2 {
-  opacity: 0; /* Hidden during the first half, visible during the second half */
+.signin:hover {
+  background-color: #2d2d2d;
 }
 
 ```

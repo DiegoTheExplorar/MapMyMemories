@@ -1,8 +1,6 @@
-import { getAuth } from 'firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { db } from '../firebase-config';
+import { fetchImagesByLocation } from '../Firebase/firebasehelper';
 import './DetailsPage.css';
 
 const DetailsPage = () => {
@@ -14,25 +12,9 @@ const DetailsPage = () => {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (user) {
-        const userId = user.uid;
-        const userDocRef = collection(db, `users/${userId}/locations`);
-        const latNum = parseFloat(lat);
-        const lngNum = parseFloat(lng);
-        const q = query(userDocRef, where("latitude", "==", latNum), where("longitude", "==", lngNum));
-
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const allImages = querySnapshot.docs.flatMap(doc => doc.data().images);
-          setImages(allImages);
-          setAddress(querySnapshot.docs[0].data().address || 'Address not found');
-        } else {
-          console.log("No images found at this location.");
-        }
-      }
+      const { allImages, address } = await fetchImagesByLocation(lat, lng);
+      setImages(allImages);
+      setAddress(address);
     };
 
     fetchImages();

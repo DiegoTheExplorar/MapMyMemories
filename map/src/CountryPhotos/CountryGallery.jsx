@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchEntriesByCountry, fetchUniqueCountries } from '../firebasehelper';
+import { fetchEntriesByCountry, fetchUniqueCountries } from '../Firebase/firebasehelper';
 import './CountryGallery.css';
 const CountryGallery = () => {
   const [selectedOption, setSelectedOption] = useState('');

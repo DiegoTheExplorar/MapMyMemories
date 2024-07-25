@@ -1,8 +1,3 @@
-import axios from 'axios';
-import exifr from 'exifr';
-import { getAuth } from 'firebase/auth';
-import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import L from 'leaflet';
 import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet/dist/leaflet.css';
@@ -10,16 +5,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase-config';
+import * as firebaseOperations from '../Firebase/firebasehelper';
 import HamburgerMenu from '../HamburgerMenu/Hamburger';
 import './MyMap.css';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
   iconUrl: './camera.png',
-  iconSize: [20, 20], 
-  iconAnchor: [20, 20], 
-  popupAnchor: [0, -40] 
+  iconSize: [20, 20],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -40]
 });
 
 const MyMap = () => {
@@ -28,11 +23,7 @@ const MyMap = () => {
   const [location, setLocation] = useState({ lat: null, long: null });
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchLocations();
-  }, []);
-
-  const fetchLocation = () => {
+  const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -58,85 +49,21 @@ const MyMap = () => {
     }
   };
 
-  useEffect(() => {
-    fetchLocation();
+  const fetchLocations = useCallback(async () => {
+    const fetchedMarkers = await firebaseOperations.fetchLocations();
+    setMarkers(fetchedMarkers);
   }, []);
 
-  const fetchLocations = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      const userId = user.uid;
-      const userDocRef = doc(db, "users", userId);
-      const locationsRef = collection(userDocRef, "locations");
-      const querySnapshot = await getDocs(locationsRef);
-      const fetchedMarkers = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        lat: doc.data().latitude,
-        lng: doc.data().longitude,
-        images: doc.data().images
-      }));
-      setMarkers(fetchedMarkers);
-    }
-  };
-
-  const getCountry = async (lat, long) => {
-    try {
-      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${lat}%2C${long}&key=${import.meta.env.VITE_OPENCAGE_API_KEY}`);
-      const results = response.data.results; 
-      if (results.length > 0) {
-        const country = results[0].components.country; 
-        const address = results[0].formatted;
-        return {country,address}; 
-      }
-      return null; 
-    } catch (error) {
-      console.error('Error fetching country:', error);
-      return null;
-    }
-  };
+  useEffect(() => {
+    fetchCurrentLocation();
+    fetchLocations();
+  }, [fetchLocations]);
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Please sign in to upload images.");
-      return;
-    }
-    const userId = user.uid;
     acceptedFiles.forEach(async (file) => {
-      const {latitude, longitude} = await exifr.gps(file);
-      console.log('Got coords')
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${userId}/${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('Got the image URL and uploaded to storage')
-      const userDocRef = doc(db, "users", userId);
-      const locationsRef = collection(userDocRef, "locations");
-      const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
-      const locQuerySnapshot = await getDocs(locQuery);
-      const {country,address} = await getCountry(latitude, longitude);
-      console.log(country) 
-      if (!locQuerySnapshot.empty) {
-        const locDoc = locQuerySnapshot.docs[0];
-        await updateDoc(doc(locationsRef, locDoc.id), {
-          images: arrayUnion(downloadURL)
-        });
-      } else {
-        await addDoc(locationsRef, {
-          latitude,
-          longitude,
-          images: [downloadURL],
-          timestamp: new Date().getTime(),
-          country,
-          address
-        });
-      }
-      alert('Image successfully added!');
-      fetchLocations(); 
+      await firebaseOperations.uploadImageAndFetchLocations(file, firebaseOperations.getCountry, fetchLocations);
     });
-  }, []);
+  }, [fetchLocations]);
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 

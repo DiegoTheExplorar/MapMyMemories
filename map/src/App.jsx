@@ -6,7 +6,7 @@ import DetailsPage from './DetailsPage/DetailsPage';
 import ImageGallery from './ImageGallery/ImageGallery';
 import MainLayout from './MainLayout';
 import MyMap from './Map/MyMap';
-import SignInPage from './SignInPage';
+import SignInPage from './SigninPage/SignInPage';
 
 function RouterAwareComponent() {
   const location = useLocation();
