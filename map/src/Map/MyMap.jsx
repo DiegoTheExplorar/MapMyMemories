@@ -1,4 +1,5 @@
 import axios from 'axios';
+import exifr from 'exifr';
 import { getAuth } from 'firebase/auth';
 import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -104,10 +105,7 @@ const MyMap = () => {
     }
     const userId = user.uid;
     acceptedFiles.forEach(async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await axios.post('https://travelphoto-4c6a27f33f4a.herokuapp.com/upload', formData);
-      const { latitude, longitude } = response.data;
+      const {latitude, longitude} = await exifr.gps(file);
       console.log('Got coords')
       const storage = getStorage();
       const storageRef = ref(storage, `images/${userId}/${file.name}`);
