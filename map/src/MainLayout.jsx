@@ -1,10 +1,11 @@
 import React from 'react';
 import HamburgerMenu from './HamburgerMenu/Hamburger';
-const MainLayout = ({ children }) => {
+
+const MainLayout = ({ children, toggleDarkMode, isDarkMode }) => {
   return (
     <>
-      <HamburgerMenu />
-      <div>{children}</div>
+      <HamburgerMenu toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+      <div className="bg-white dark:bg-gray-900 text-black dark:text-white">{children}</div>
     </>
   );
 };

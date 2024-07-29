@@ -19,7 +19,7 @@ function RouterAwareComponent() {
 }
 
 // Component for protected routes
-const PrivateRoute = ({ element }) => {
+const PrivateRoute = ({ element, toggleDarkMode, isDarkMode }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,7 @@ const PrivateRoute = ({ element }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  return user ? element : <Navigate to="/signin" />;
+  return user ? React.cloneElement(element, { toggleDarkMode, isDarkMode }) : <Navigate to="/signin" />;
 };
 
 const routes = [
@@ -48,19 +48,28 @@ const routes = [
 ];
 
 const App = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <Router>
-      <RouterAwareComponent />
-      <Routes>
-        {routes.map(({ path, element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={element}
-          />
-        ))}
-      </Routes>
-    </Router>
+    <div className={isDarkMode ? 'dark' : ''}>
+      <Router>
+        <RouterAwareComponent />
+        <Routes>
+          {routes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={React.cloneElement(element, { toggleDarkMode, isDarkMode })}
+            />
+          ))}
+        </Routes>
+      </Router>
+    </div>
   );
 };
 

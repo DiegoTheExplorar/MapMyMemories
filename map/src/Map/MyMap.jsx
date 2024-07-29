@@ -7,7 +7,6 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import * as firebaseOperations from '../Firebase/firebasehelper';
 import HamburgerMenu from '../HamburgerMenu/Hamburger';
-import './MyMap.css';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
@@ -68,13 +67,13 @@ const MyMap = () => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div className="app-container">
-      <div {...getRootProps()} className="dropzone">
+    <div className="flex flex-col items-center justify-center min-h-screen text-white">
+      <div {...getRootProps()} className="border-2 border-blue-500 p-5 text-center my-5 cursor-pointer bg-white rounded-lg text-blue-500 transition-colors duration-200 w-3/4 hover:bg-gray-200">
         <input {...getInputProps()} />
         <p>Drag 'n' drop images here, or click to select images</p>
       </div>
       {location.lat && location.long && (
-        <MapContainer center={[location.lat, location.long]} zoom={13} className="map-container">
+        <MapContainer center={[location.lat, location.long]} zoom={13} className="h-[80vh] w-[90vw] my-5">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {markers.map((marker, index) => (
             <Marker
@@ -103,3 +102,4 @@ const MyMap = () => {
 };
 
 export default MyMap;
+

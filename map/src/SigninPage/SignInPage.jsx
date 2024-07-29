@@ -1,8 +1,7 @@
-// SignInPage.js
+import classNames from 'classnames';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './SignInPage.module.css';
 
 const imageCredits = {
   photo1: (
@@ -48,18 +47,26 @@ const SignInPage = () => {
   }, [currentImage]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.imageSection}></div>
-      <div className={styles.formSection}>
-        <div className={styles.message}>
+    <div className="flex flex-col md:flex-row h-screen w-screen font-sans">
+      <div className={classNames("flex-1 bg-cover bg-center relative transition-all duration-1000", {
+        'bg-[url("/photo1.jpg")]': currentImage === 'photo1',
+        'bg-[url("/photo2.jpg")]': currentImage === 'photo2',
+        'bg-[url("/photo3.jpg")]': currentImage === 'photo3',
+      })}>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center bg-gray-800 bg-opacity-90 p-6">
+        <div className="text-center mb-4 text-white text-lg">
           <p>Welcome to MapMyMemories!</p>
           <p>Discover and remember your favorite places with ease.</p>
         </div>
-        <button onClick={handleGoogleSignIn} className={styles.signin}>
+        <button
+          onClick={handleGoogleSignIn}
+          className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white px-4 py-2 rounded-full transition duration-300 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700"
+        >
           Sign in with Google
         </button>
       </div>
-      <div className={styles.credits}>
+      <div className="absolute bottom-2 left-2 text-white text-xs">
         {imageCredits[currentImage]}
       </div>
     </div>

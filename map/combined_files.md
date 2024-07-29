@@ -17,6 +17,7 @@ import SignInPage from './SigninPage/SignInPage';
 function RouterAwareComponent() {
   const location = useLocation();
 
+  
   useEffect(() => {
     sessionStorage.setItem('lastLocation', location.pathname);
   }, [location]);
@@ -78,7 +79,7 @@ export default App;
 ```jsx
 import React, { useEffect, useState } from 'react';
 import { fetchEntriesByCountry, fetchUniqueCountries } from '../Firebase/firebasehelper';
-import './CountryGallery.css';
+
 const CountryGallery = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [options, setOptions] = useState([]);
@@ -102,20 +103,20 @@ const CountryGallery = () => {
 
   return (
     <div>
-      <div className='option-box'>
-        <label className='label'>Choose a country:</label>
-        <select id="dropdown" value={selectedOption} onChange={handleChange}>
+      <div className='flex justify-center items-center my-8 text-lg text-gray-800'>
+        <label className='mr-4 text-azure'>Choose a country:</label>
+        <select id="dropdown" value={selectedOption} onChange={handleChange} className="w-64 p-2 rounded-md border-2 border-blue-500 bg-white cursor-pointer shadow transition-colors duration-300 focus:border-blue-700 focus:shadow-lg">
           <option value="" disabled>Select an option</option>
           {options.map((option, index) => (
             <option key={index} value={option}>{option}</option>
           ))}
         </select>
       </div>
-      <div className="gallery-container">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5">
         {images.length > 0 ? (
           images.map((image, index) => (
-            <div key={index} className="image-item">
-              <img src={image} alt={`Item ${index}`} />
+            <div key={index} className="overflow-hidden rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+              <img src={image} alt={`Item ${index}`} className="w-full h-auto transition-transform duration-300 hover:scale-110" />
             </div>
           ))
         ) : (
@@ -135,7 +136,6 @@ export default CountryGallery;
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fetchImagesByLocation } from '../Firebase/firebasehelper';
-import './DetailsPage.css';
 
 const DetailsPage = () => {
   const { lat, lng } = useParams();
@@ -163,21 +163,21 @@ const DetailsPage = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="header">Images at {address}</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-5">
+      <h1 className="text-3xl mb-4">{`Images at ${address}`}</h1>
       {images.length > 0 ? (
-        <div className="image-carousel">
-          <img src={images[currentImage]} alt="Slideshow" />
+        <div className="relative">
+          <img src={images[currentImage]} alt="Slideshow" className="w-full h-80 object-cover rounded-lg shadow-lg" />
           {images.length > 1 && (
-            <div className="carousel-controls">
-              <button onClick={prevImage}>Previous</button>
-              <button onClick={nextImage}>Next</button>
+            <div className="flex mt-2">
+              <button onClick={prevImage} className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-md hover:bg-blue-700">Previous</button>
+              <button onClick={nextImage} className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-md hover:bg-blue-700">Next</button>
             </div>
           )}
         </div>
       ) : (
-        <div className="loading-container">
-          <div className="spinner"></div>
+        <div className="flex items-center justify-center min-h-80">
+          <div className="spinner border-t-4 border-blue-500 border-solid rounded-full w-12 h-12 animate-spin"></div>
         </div>
       )}
     </div>
@@ -195,8 +195,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import './Hamburger.css';
 
 const HamburgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -238,26 +236,26 @@ const HamburgerMenu = () => {
 
   return (
     <div>
-      <div className={`menu-icon ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
+      <div className={`text-2xl cursor-pointer fixed top-4 right-4 transition-colors duration-300 z-[9999] ${isOpen ? 'text-white' : 'text-black'}`} onClick={toggleMenu}>
         &#9776;
       </div>
-      <div className={`menu ${isOpen ? 'open' : ''}`}>
-        <button onClick={() => { navigate('/map'); closeMenu(); }}>
+      <div className={`fixed top-0 right-0 h-full bg-gray-900 transition-width duration-500 flex flex-col justify-start pt-16 z-[9998] ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+        <button onClick={() => { navigate('/map'); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
           <FontAwesomeIcon icon={faMap} /> Map
         </button>
-        <button className="sign-out-button" onClick={() => { handleSignOut(); closeMenu(); }}>
-          <FontAwesomeIcon icon={faSignOutAlt} /> Sign Out
-        </button>
-        <button onClick={() => { navigate('/gallery'); closeMenu(); }}>
+        <button onClick={() => { navigate('/gallery'); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
           <FontAwesomeIcon icon={faImage} /> View Gallery
         </button>
-        <button onClick={() => { navigate('/country'); closeMenu(); }}>
+        <button onClick={() => { navigate('/country'); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
           <FontAwesomeIcon icon={faGlobe} /> View Images by Country
         </button>
+        <button onClick={() => { handleSignOut(); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
+          <FontAwesomeIcon icon={faSignOutAlt} /> Sign Out
+        </button>
         {profilePicUrl && (
-          <div className="profile-container">
-            <img src={profilePicUrl} alt="Profile" className="profile-pic" />
-            <span className="username">{username}</span>
+          <div className="absolute bottom-8 w-full flex flex-col items-center text-gray-400">
+            <img src={profilePicUrl} alt="Profile" className="w-16 h-16 rounded-full mb-2" />
+            <span className="text-lg">{username}</span>
           </div>
         )}
       </div>
@@ -266,13 +264,13 @@ const HamburgerMenu = () => {
 }
 
 export default HamburgerMenu;
+
 ```
 
 ### src\ImageGallery\ImageGallery.jsx
 ```jsx
 import React, { useEffect, useState } from 'react';
 import { fetchUserImages } from '../Firebase/firebasehelper';
-import './ImageGallery.css';
 
 const ImageGallery = () => {
     const [images, setImages] = useState([]);
@@ -287,11 +285,11 @@ const ImageGallery = () => {
     }, []);
 
     return (
-        <div className="gallery-container">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5">
             {images.length > 0 ? (
                 images.map((image, index) => (
-                    <div key={index} className="image-item">
-                        <img src={image} alt={`Item ${index}`} />
+                    <div key={index} className="overflow-hidden rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                        <img src={image} alt={`Item ${index}`} className="w-full h-auto transition-transform duration-300 hover:scale-110" />
                     </div>
                 ))
             ) : (
@@ -302,6 +300,7 @@ const ImageGallery = () => {
 };
 
 export default ImageGallery;
+
 
 ```
 
@@ -327,7 +326,7 @@ import HamburgerMenu from './HamburgerMenu/Hamburger';
 const MainLayout = ({ children }) => {
   return (
     <>
-      <HamburgerMenu />
+      <HamburgerMenu/>
       <div>{children}</div>
     </>
   );
@@ -347,7 +346,6 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import * as firebaseOperations from '../Firebase/firebasehelper';
 import HamburgerMenu from '../HamburgerMenu/Hamburger';
-import './MyMap.css';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
@@ -408,13 +406,13 @@ const MyMap = () => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div className="app-container">
-      <div {...getRootProps()} className="dropzone">
+    <div className="flex flex-col items-center justify-center min-h-screen text-white">
+      <div {...getRootProps()} className="border-2 border-blue-500 p-5 text-center my-5 cursor-pointer bg-white rounded-lg text-blue-500 transition-colors duration-200 w-3/4 hover:bg-gray-200">
         <input {...getInputProps()} />
         <p>Drag 'n' drop images here, or click to select images</p>
       </div>
       {location.lat && location.long && (
-        <MapContainer center={[location.lat, location.long]} zoom={13} className="map-container">
+        <MapContainer center={[location.lat, location.long]} zoom={13} className="h-[80vh] w-[90vw] my-5">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {markers.map((marker, index) => (
             <Marker
@@ -443,6 +441,7 @@ const MyMap = () => {
 };
 
 export default MyMap;
+
 
 ```
 
@@ -498,14 +497,33 @@ export default SearchBar;
 
 ### src\SigninPage\SignInPage.jsx
 ```jsx
+import classNames from 'classnames';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './SignInPage.module.css';
+
+const imageCredits = {
+  photo1: (
+    <>
+      <a href="https://stocksnap.io/photo/sunrise-sunset-XSTO5645BM">Photo</a> by <a href="https://stocksnap.io/author/653">Jordan McQueen</a> on <a href="https://stocksnap.io">StockSnap</a>
+    </>
+  ),
+  photo2: (
+    <>
+      <a href="https://www.freepik.com/free-photo/medium-shot-contemplative-man-seaside_47696347.htm">Image by freepik</a>
+    </>
+  ),
+  photo3: (
+    <>
+      <a href="https://www.freepik.com/free-photo/beautiful-girl-standing-boat-looking-mountains-ratchaprapha-dam-khao-sok-national-park-surat-thani-province-thailand_13180933.htm#fromView=search&page=1&position=21&uuid=8dcae0bb-3af0-45e2-9386-99741de8513d">Image by tawatchai07 on Freepik</a>
+    </>
+  ),
+};
 
 const SignInPage = () => {
   const navigate = useNavigate();
-  
+  const [currentImage, setCurrentImage] = useState('photo1');
+
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
@@ -518,17 +536,37 @@ const SignInPage = () => {
     }
   };
 
+  useEffect(() => {
+    const cycleImages = () => {
+      const current = currentImage === 'photo1' ? 'photo2' : currentImage === 'photo2' ? 'photo3' : 'photo1';
+      setCurrentImage(current);
+    };
+    const interval = setInterval(cycleImages, 5000);
+    return () => clearInterval(interval);
+  }, [currentImage]);
+
   return (
-    <div className={styles.container}>
-      <div className={styles.imageSection}></div>
-      <div className={styles.formSection}>
-        <div className={styles.message}>
+    <div className="flex flex-col md:flex-row h-screen w-screen font-sans">
+      <div className={classNames("flex-1 bg-cover bg-center relative transition-all duration-1000", {
+        'bg-[url("/photo1.jpg")]': currentImage === 'photo1',
+        'bg-[url("/photo2.jpg")]': currentImage === 'photo2',
+        'bg-[url("/photo3.jpg")]': currentImage === 'photo3',
+      })}>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center bg-gray-800 bg-opacity-90 p-6">
+        <div className="text-center mb-4 text-white text-lg">
           <p>Welcome to MapMyMemories!</p>
           <p>Discover and remember your favorite places with ease.</p>
         </div>
-        <button onClick={handleGoogleSignIn} className={styles.signin}>
+        <button
+          onClick={handleGoogleSignIn}
+          className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white px-4 py-2 rounded-full transition duration-300 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700"
+        >
           Sign in with Google
         </button>
+      </div>
+      <div className="absolute bottom-2 left-2 text-white text-xs">
+        {imageCredits[currentImage]}
       </div>
     </div>
   );
@@ -583,438 +621,12 @@ export default SignInPage;
 
 ```
 
-### src\CountryPhotos\CountryGallery.css
-```css
-.option-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 30px 20px;
-  font-size: 16px;
-  color: #333;
-}
-
-.option-box select {
-  width: 250px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 2px solid #007BFF; 
-  background-color: white;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.option-box select:hover,
-.option-box select:focus {
-  border-color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.label{
-  color: azure;
-}
-
-.gallery-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  grid-gap: 15px;
-  padding: 20px;
-}
-
-.image-item {
-  overflow: hidden; 
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-.image-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.image-item img {
-  width: 100%;
-  height: auto;
-  transition: transform 0.3s ease-in-out;
-}
-
-.image-item img:hover {
-  transform: scale(1.1);
-}
-
-@media (max-width: 768px) {
-  .option-box select {
-    width: 100%;
-  }
-  
-  .gallery-container {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-}
-
-```
-
-### src\DetailsPage\DetailsPage.css
-```css
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: #f4f4f4;
-  padding: 20px;
-}
-
-.image-carousel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative; 
-}
-
-img {
-  max-width: 100%;
-  height: 303px; 
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  object-fit: cover;
-}
-
-.carousel-controls {
-  display: flex;
-  margin-top: 10px;
-}
-
-button {
-  padding: 8px 16px;
-  margin: 0 5px;
-  border: none;
-  background-color: #007BFF;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.loading-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px; 
-}
-
-.spinner {
-  border: 8px solid #f3f3f3; 
-  border-top: 8px solid #007BFF; 
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Header styles */
-.header {
-  position: absolute; 
-  top: 10px;
-  width: 100%;
-  text-align: center;
-  margin-bottom: 20px; 
-  font-size: 2.5em;
-}
-
-```
-
-### src\HamburgerMenu\Hamburger.css
-```css
-body {
-    font-family: Arial, sans-serif;
-  }
-  
-  .menu-icon {
-    font-size: 30px;
-    cursor: pointer;
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    color: black;
-    transition: color 0.3s;
-    z-index: 1001;
-  }
-  
-  .menu-icon.open {
-    color: white;
-  }
-  
-  .menu {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    top: 0;
-    right: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    transition: width 0.5s;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 60px;
-    z-index: 1000; 
-  }
-  
-  .menu button {
-    padding: 15px 20px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #818181;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background-color 0.3s, color 0.3s;
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-  }
-  
-  .menu button:hover {
-    color: #f1f1f1;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .menu.open {
-    width: 250px;
-  }
-  
-  .profile-container {
-    position: absolute;
-    bottom: 30px;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 20px;
-  }
-  
-  .profile-pic {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-  }
-  
-  .username {
-    font-size: 20px;
-    color: #818181;
-    margin-bottom: 20%;
-  }
-  
-  @media (max-width: 768px) {
-    .menu {
-      padding-top: 20px;
-    }
-  
-    .menu button {
-      font-size: 16px;
-      padding: 12px 15px;
-    }
-  
-    .profile-pic {
-      width: 50px;
-      height: 50px;
-    }
-  
-    .username {
-      font-size: 18px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .menu-icon {
-      font-size: 24px;
-      top: 10px;
-      right: 10px;
-    }
-  
-    .menu.open {
-      width: 200px;
-    }
-  
-    .menu button {
-      font-size: 14px;
-      padding: 10px 10px;
-    }
-  
-    .profile-pic {
-      width: 40px;
-      height: 40px;
-    }
-  
-    .username {
-      font-size: 16px;
-    }
-  }
-```
-
-### src\ImageGallery\ImageGallery.css
-```css
-.gallery-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-gap: 10px;
-    padding: 20px;
-}
-
-.image-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.image-item img:hover {
-    transform: scale(1.1);
-}
-
-```
-
 ### src\index.css
 ```css
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Arial', sans-serif;
-    background-color: rgb(65, 65, 65)
-  }
-  
-  #root {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  h1{
-    text-align: center;
-    margin-top: 20px;
-    font-size: 1em;
-  }
-  
-```
 
-### src\Map\MyMap.css
-```css
-.app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh; 
-  color: white; 
-}
-
-.map-container {
-  height: 75vh;
-  width: 80%;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.dropzone {
-  border: 2px dashed #007bff;
-  padding: 20px;
-  text-align: center;
-  margin: 20px auto;
-  cursor: pointer;
-  background-color: #ffffff; 
-  border-radius: 5px;
-  color: #007bff;
-  transition: background-color 0.2s;
-  width: 70%;
-}
-
-.dropzone:hover {
-  background-color: #e2e6ea;
-}
-
-@media (max-width: 600px) {
-  .map-container {
-      height: 50vh;
-  }
-}
-
-```
-
-### src\SigninPage\SignInPage.module.css
-```css
-.container {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-}
-
-.imageSection {
-  flex: 2;
-  animation: backgroundCycle 10s infinite alternate;
-  background-size: cover;
-  background-position: center;
-}
-
-@keyframes backgroundCycle {
-  0%, 100% {
-    background-image: url('/photo1.jpg');
-  }
-  50% {
-    background-image: url('/photo2.jpg');
-  }
-}
-
-.formSection {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(8, 10, 51, 0.85);
-  padding: 20px;
-}
-
-.message {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #f1f1f1;
-  font-size: larger;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-}
-
-.signin {
-  background-color: #272726;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.signin:hover {
-  background-color: #2d2d2d;
-}
 
 ```
