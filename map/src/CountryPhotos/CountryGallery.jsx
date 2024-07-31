@@ -24,9 +24,14 @@ const CountryGallery = () => {
 
   return (
     <div>
-      <div className='flex justify-center items-center my-8 text-lg text-gray-800'>
-        <label className='mr-4 text-azure'>Choose a country:</label>
-        <select id="dropdown" value={selectedOption} onChange={handleChange} className="w-64 p-2 rounded-md border-2 border-blue-500 bg-white cursor-pointer shadow transition-colors duration-300 focus:border-blue-700 focus:shadow-lg">
+      <div className='flex justify-center items-center my-8 text-lg'>
+        <label className='mr-4'>Choose a country:</label>
+        <select
+          id="dropdown"
+          value={selectedOption}
+          onChange={handleChange}
+          className="w-64 p-2 rounded-md border-2 border-blue-500 bg-white dark:bg-gray-700 dark:text-white cursor-pointer shadow transition-colors duration-300 focus:border-blue-700 focus:shadow-lg"
+        >
           <option value="" disabled>Select an option</option>
           {options.map((option, index) => (
             <option key={index} value={option}>{option}</option>

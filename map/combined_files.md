@@ -17,7 +17,6 @@ import SignInPage from './SigninPage/SignInPage';
 function RouterAwareComponent() {
   const location = useLocation();
 
-  
   useEffect(() => {
     sessionStorage.setItem('lastLocation', location.pathname);
   }, [location]);
@@ -26,7 +25,7 @@ function RouterAwareComponent() {
 }
 
 // Component for protected routes
-const PrivateRoute = ({ element }) => {
+const PrivateRoute = ({ element, toggleDarkMode, isDarkMode }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +41,7 @@ const PrivateRoute = ({ element }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  return user ? element : <Navigate to="/signin" />;
+  return user ? React.cloneElement(element, { toggleDarkMode, isDarkMode }) : <Navigate to="/signin" />;
 };
 
 const routes = [
@@ -55,19 +54,28 @@ const routes = [
 ];
 
 const App = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <Router>
-      <RouterAwareComponent />
-      <Routes>
-        {routes.map(({ path, element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={element}
-          />
-        ))}
-      </Routes>
-    </Router>
+    <div className={isDarkMode ? 'dark' : ''}>
+      <Router>
+        <RouterAwareComponent />
+        <Routes>
+          {routes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={React.cloneElement(element, { toggleDarkMode, isDarkMode })}
+            />
+          ))}
+        </Routes>
+      </Router>
+    </div>
   );
 };
 
@@ -190,13 +198,13 @@ export default DetailsPage;
 
 ### src\HamburgerMenu\Hamburger.jsx
 ```jsx
-import { faGlobe, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faImage, faMap, faMoon, faSignOutAlt, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const HamburgerMenu = () => {
+const HamburgerMenu = ({ toggleDarkMode, isDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [profilePicUrl, setProfilePicUrl] = useState(null);
   const [username, setUsername] = useState(null);
@@ -236,7 +244,7 @@ const HamburgerMenu = () => {
 
   return (
     <div>
-      <div className={`text-2xl cursor-pointer fixed top-4 right-4 transition-colors duration-300 z-[9999] ${isOpen ? 'text-white' : 'text-black'}`} onClick={toggleMenu}>
+      <div className={`text-2xl cursor-pointer fixed top-4 right-4 transition-colors duration-300 z-[9999] ${isOpen ? 'text-white' : 'text-black dark:text-white'}`} onClick={toggleMenu}>
         &#9776;
       </div>
       <div className={`fixed top-0 right-0 h-full bg-gray-900 transition-width duration-500 flex flex-col justify-start pt-16 z-[9998] ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
@@ -251,6 +259,9 @@ const HamburgerMenu = () => {
         </button>
         <button onClick={() => { handleSignOut(); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
           <FontAwesomeIcon icon={faSignOutAlt} /> Sign Out
+        </button>
+        <button onClick={toggleDarkMode} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
+          <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} /> {isDarkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
         {profilePicUrl && (
           <div className="absolute bottom-8 w-full flex flex-col items-center text-gray-400">
@@ -323,16 +334,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 ```jsx
 import React from 'react';
 import HamburgerMenu from './HamburgerMenu/Hamburger';
-const MainLayout = ({ children }) => {
+
+const MainLayout = ({ children, toggleDarkMode, isDarkMode }) => {
   return (
     <>
-      <HamburgerMenu/>
-      <div>{children}</div>
+      <HamburgerMenu toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+      <div className="bg-white dark:bg-gray-900 text-black dark:text-white">{children}</div>
     </>
   );
 };
 
 export default MainLayout;
+
 ```
 
 ### src\Map\MyMap.jsx
@@ -413,7 +426,7 @@ const MyMap = () => {
       </div>
       {location.lat && location.long && (
         <MapContainer center={[location.lat, location.long]} zoom={13} className="h-[80vh] w-[90vw] my-5">
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
           {markers.map((marker, index) => (
             <Marker
               key={index}
@@ -441,7 +454,6 @@ const MyMap = () => {
 };
 
 export default MyMap;
-
 
 ```
 
@@ -577,49 +589,6 @@ export default SignInPage;
 ```
 
 ## CSS Files
-
-### src\App.css
-```css
-.back-button, .signout-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin: 10px;
-}
-.details-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-.details-image {
-  max-width: 20%;
-  height: auto;
-  display: block;
-  margin: auto; 
-}
-
-.details-nav {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-
-
-.back-button:hover, .signout-button:hover {
-  background-color: #0056b3;
-}
-
-
-```
 
 ### src\index.css
 ```css

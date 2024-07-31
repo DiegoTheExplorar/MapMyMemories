@@ -6,7 +6,6 @@ import { useDropzone } from 'react-dropzone';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import * as firebaseOperations from '../Firebase/firebasehelper';
-import HamburgerMenu from '../HamburgerMenu/Hamburger';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
@@ -16,7 +15,7 @@ const photoIcon = new L.Icon({
   popupAnchor: [0, -40]
 });
 
-const MyMap = () => {
+const MyMap = ({ isDarkMode }) => {
   const navigate = useNavigate();
   const [markers, setMarkers] = useState([]);
   const [location, setLocation] = useState({ lat: null, long: null });
@@ -66,15 +65,19 @@ const MyMap = () => {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  const tileLayerUrl = isDarkMode
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-white">
-      <div {...getRootProps()} className="border-2 border-blue-500 p-5 text-center my-5 cursor-pointer bg-white rounded-lg text-blue-500 transition-colors duration-200 w-3/4 hover:bg-gray-200">
+    <div className="flex flex-col items-center justify-center min-h-screen text-black dark:text-white">
+      <div {...getRootProps()} className="border-2 border-blue-500 p-5 text-center my-5 cursor-pointer bg-white dark:bg-gray-700 dark:text-white rounded-lg transition-colors duration-200 w-3/4 hover:bg-gray-200 dark:hover:bg-gray-600">
         <input {...getInputProps()} />
         <p>Drag 'n' drop images here, or click to select images</p>
       </div>
       {location.lat && location.long && (
         <MapContainer center={[location.lat, location.long]} zoom={13} className="h-[80vh] w-[90vw] my-5">
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer url={tileLayerUrl} />
           {markers.map((marker, index) => (
             <Marker
               key={index}
@@ -96,10 +99,8 @@ const MyMap = () => {
           <SearchBar />
         </MapContainer>
       )}
-      <HamburgerMenu />
     </div>
   );
 };
 
 export default MyMap;
-
