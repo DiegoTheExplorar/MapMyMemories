@@ -1,8 +1,9 @@
-import { faGlobe, faImage, faMap, faMoon, faSignOutAlt, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faImage, faMap, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Switch from 'react-switch';
 
 const HamburgerMenu = ({ toggleDarkMode, isDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,9 +61,21 @@ const HamburgerMenu = ({ toggleDarkMode, isDarkMode }) => {
         <button onClick={() => { handleSignOut(); closeMenu(); }} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
           <FontAwesomeIcon icon={faSignOutAlt} /> Sign Out
         </button>
-        <button onClick={toggleDarkMode} className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
-          <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} /> {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        </button>
+        <div className="text-gray-400 p-4 text-left hover:text-white hover:bg-gray-800 flex items-center gap-2">
+          <span className="mr-2">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          <Switch 
+            onChange={toggleDarkMode} 
+            checked={isDarkMode} 
+            offColor="#888"
+            onColor="#000"
+            offHandleColor="#fff"
+            onHandleColor="#fff"
+            uncheckedIcon={false}
+            checkedIcon={false}
+            height={20}
+            width={40}
+          />
+        </div>
         {profilePicUrl && (
           <div className="absolute bottom-8 w-full flex flex-col items-center text-gray-400">
             <img src={profilePicUrl} alt="Profile" className="w-16 h-16 rounded-full mb-2" />

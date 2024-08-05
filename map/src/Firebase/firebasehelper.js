@@ -59,8 +59,6 @@ export const uploadImageAndFetchLocations = async (file, getCountry, fetchLocati
     const locationsRef = collection(userDocRef, "locations");
     const locQuery = query(locationsRef, where("latitude", "==", latitude), where("longitude", "==", longitude));
     const locQuerySnapshot = await getDocs(locQuery);
-    const { country, address } = await getCountry(latitude, longitude);
-    console.log(country, address);
 
     if (!locQuerySnapshot.empty) {
       const locDoc = locQuerySnapshot.docs[0];
@@ -68,6 +66,8 @@ export const uploadImageAndFetchLocations = async (file, getCountry, fetchLocati
         images: arrayUnion(downloadURL)
       });
     } else {
+      const { country, address } = await getCountry(latitude, longitude);
+      console.log(country, address);
       await addDoc(locationsRef, {
         latitude,
         longitude,
