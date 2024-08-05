@@ -42,7 +42,7 @@ const routes = [
   { path: "/", element: <Navigate replace to="/signin" /> },
   { path: "/signin", element: <SignInPage /> },
   { path: "/map", element: <PrivateRoute element={<MainLayout><MyMap /></MainLayout>} /> },
-  { path: "/details/:lat/:lng", element: <PrivateRoute element={<MainLayout><DetailsPage /></MainLayout>} /> },
+  { path: "/memories", element: <PrivateRoute element={<MainLayout><DetailsPage /></MainLayout>} /> },
   { path: "/gallery", element: <PrivateRoute element={<MainLayout><ImageGallery /></MainLayout>} /> },
   { path: "/country", element: <PrivateRoute element={<MainLayout><CountryGallery /></MainLayout>} /> },
 ];

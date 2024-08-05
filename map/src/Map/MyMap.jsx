@@ -84,7 +84,11 @@ const MyMap = ({ isDarkMode }) => {
               position={[marker.lat, marker.lng]}
               icon={photoIcon}
               eventHandlers={{
-                click: () => navigate(`/details/${marker.lat}/${marker.lng}`),
+                click: () => {
+                  sessionStorage.setItem('lat', marker.lat);
+                  sessionStorage.setItem('lng', marker.lng);
+                  navigate('/memories');
+                },
                 mouseover: (e) => {
                   e.target.openPopup();
                 },

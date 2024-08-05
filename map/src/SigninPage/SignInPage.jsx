@@ -61,7 +61,7 @@ const SignInPage = () => {
         </div>
         <button
           onClick={handleGoogleSignIn}
-          className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white px-4 py-2 rounded-full transition duration-300 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700"
+          className="btn-grad"
         >
           Sign in with Google
         </button>
