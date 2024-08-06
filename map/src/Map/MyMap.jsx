@@ -9,8 +9,8 @@ import * as firebaseOperations from '../Firebase/firebasehelper';
 import SearchBar from './SearchBar';
 
 const photoIcon = new L.Icon({
-  iconUrl: './camera.png',
-  iconSize: [20, 20],
+  iconUrl: './markercam.png',
+  iconSize: [30, 30],
   iconAnchor: [20, 20],
   popupAnchor: [0, -40]
 });
