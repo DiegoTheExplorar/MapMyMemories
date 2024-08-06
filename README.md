@@ -1,143 +1,124 @@
 # MapMyMemories
 
-MapMyMemories is a web application that allows users to upload images, view images by location on a map, and explore galleries of images by country. This application integrates with Firebase for authentication and data storage.
+MapMyMemories is a web application that allows users to upload and view their photos on a map. Users can sign in using Google authentication, view photos by country, browse their image gallery, and explore photos at specific locations. The app also supports dark mode and features a responsive design.
 
 ## Features
 
-- **User Authentication**: Sign in with Google using Firebase Authentication.
-- **Image Upload**: Upload images and geotag them to specific locations on the map.
-- **Map View**: Interactive map displaying uploaded images as markers.
-- **Image Gallery**: View uploaded images in a gallery format.
-- **Country Gallery**: Explore images by selecting a country.
-- **Responsive Design**: Mobile-friendly interface.
+- **User Authentication**: Sign in using Google authentication.
+- **Photo Upload**: Upload photos and view them on the map.
+- **Country Gallery**: Browse photos by country.
+- **Details Page**: View detailed images at specific locations.
+- **Image Gallery**: View all uploaded images in a gallery format.
+- **Dark Mode**: Toggle between light and dark mode.
+- **Responsive Design**: Optimized for both desktop and mobile devices.
+- **Search Locations**: Search for locations using the search bar on the map.
 
-## Technologies Used
+## Tech Stack
 
-- **React**: Frontend framework.
-- **Firebase**: Authentication and Firestore database.
-- **Leaflet**: Interactive map.
-- **React Router**: Navigation and routing.
-- **CSS Modules**: Styling components.
+- **Frontend**: React, Tailwind CSS
+- **Backend**: Firebase Authentication, Firestore
+- **Map**: Leaflet, React-Leaflet, Leaflet-Geosearch
+- **Image Carousel**: React-Responsive-Carousel
+- **Deployment**: Vercel
 
-## File Structure
+## Project Structure
 
 ```
 src/
-├── App.css
-├── App.jsx
+│
+├── App.jsx                 # Main application component handling routing and dark mode toggle
 ├── CountryPhotos/
-│   ├── CountryGallery.css
-│   └── CountryGallery.jsx
+│   └── CountryGallery.jsx  # Component to display photos by selected country
 ├── DetailsPage/
-│   ├── DetailsPage.css
-│   └── DetailsPage.jsx
+│   └── DetailsPage.jsx     # Component to display detailed images for a specific location
 ├── Firebase/
-│   └── firebasehelper.js
+│   └── firebasehelper.js   # Helper functions for Firebase operations (fetch, upload, etc.)
 ├── HamburgerMenu/
-│   ├── Hamburger.css
-│   └── Hamburger.jsx
+│   └── Hamburger.jsx       # Component for the hamburger menu with navigation links and dark mode toggle
 ├── ImageGallery/
-│   ├── ImageGallery.css
-│   └── ImageGallery.jsx
+│   └── ImageGallery.jsx    # Component to display user's images in a gallery format
 ├── Map/
-│   ├── MyMap.css
-│   ├── MyMap.jsx
-│   ├── SearchBar.jsx
-│   └── camera.png
+│   ├── MyMap.jsx           # Main map component for displaying and interacting with photo markers
+│   └── SearchBar.jsx       # Search bar component for finding locations on the map
 ├── SigninPage/
-│   ├── SignInPage.module.css
-│   └── SignInPage.jsx
-├── MainLayout.jsx
-├── index.css
-├── main.jsx
+│   └── SignInPage.jsx      # Component for the Google sign-in page with image carousel
+├── main.jsx                # Entry point for the React application
+├── MainLayout.jsx          # Layout component that includes the hamburger menu
+└── index.css               # Global CSS styles and Tailwind CSS imports
 ```
 
 ## Installation
 
-1. Clone the repository:
+### Prerequisites
 
-```sh
-git clone https://github.com/your-username/MapMyMemories.git
-cd MapMyMemories
-```
+- Node.js
+- Firebase project setup
 
-2. Install dependencies:
+### Steps
 
-```sh
-npm install
-```
+1. **Clone the repository**:
+   ```sh
+   git clone https://github.com/your-username/mapmymemories.git
+   cd mapmymemories
+   ```
 
-3. Set up Firebase:
+2. **Install dependencies**:
+   ```sh
+   npm install
+   ```
 
-- Create a Firebase project in the [Firebase Console](https://console.firebase.google.com/).
-- Add a web app to your Firebase project.
-- Copy the Firebase configuration and replace the config object in `src/Firebase/firebasehelper.js`.
+3. **Setup Firebase**:
+   - Create a Firebase project in the [Firebase Console](https://console.firebase.google.com/).
+   - Enable Google authentication in the Authentication section.
+   - Create a Firestore database.
+   - Add your Firebase configuration to `src/Firebase/firebasehelper.js`.
 
-4. Start the development server:
+4. **Run the development server**:
+   ```sh
+   npm run dev
+   ```
 
-```sh
-npm start
-```
+5. **Open the application**:
+   - The application will be running at `http://localhost:5173`.
 
 ## Usage
 
-1. **Sign In**: On the SignIn page, click the "Sign in with Google" button.
-2. **Upload Images**: Drag and drop images onto the map or click to select images.
-3. **View Images on Map**: Uploaded images will appear as markers on the map. Click a marker to view images from that location.
-4. **Explore Galleries**: Use the navigation menu to view image galleries or images by country.
+1. **Sign In**:
+   - Open the application and sign in using Google authentication.
 
-## Components
+2. **Upload Photos**:
+   - Drag and drop images on the map to upload them.
 
-### App.jsx
+3. **View Photos on the Map**:
+   - Click on the markers on the map to view photos at specific locations.
 
-Handles the routing of the application and user authentication state.
+4. **Browse by Country**:
+   - Go to the "View Images by Country" section and select a country to browse photos.
 
-### CountryGallery.jsx
+5. **Image Gallery**:
+   - View all uploaded images in the gallery section.
 
-Displays a dropdown to select a country and view images from that country.
+6. **Dark Mode**:
+   - Toggle dark mode using the switch in the hamburger menu.
 
-### DetailsPage.jsx
+## Contributing
 
-Shows a carousel of images from a specific location.
-
-### Hamburger.jsx
-
-Provides a navigation menu with options to view the map, galleries, and sign out.
-
-### ImageGallery.jsx
-
-Displays a gallery of images uploaded by the user.
-
-### MyMap.jsx
-
-Main map component where users can upload images and view geotagged images.
-
-### SearchBar.jsx
-
-Search bar component for the map, allowing users to search for locations.
-
-### SignInPage.jsx
-
-Sign-in page allowing users to authenticate with Google.
-
-## Styles
-
-CSS files are used to style each component, ensuring a consistent and responsive design. 
-
-- **App.css**: General styles for buttons and container elements.
-- **CountryGallery.css**: Styles for the country gallery dropdown and images.
-- **DetailsPage.css**: Styles for the image carousel on the details page.
-- **Hamburger.css**: Styles for the hamburger menu.
-- **ImageGallery.css**: Styles for the image gallery.
-- **MyMap.css**: Styles for the map and dropzone.
-- **SignInPage.module.css**: Styles for the sign-in page.
-
-## Credits
-
-- Images by [Jordan McQueen](https://stocksnap.io/photo/sunrise-sunset-XSTO5645BM) on [StockSnap](https://stocksnap.io)
-- Images by [freepik](https://www.freepik.com)
-- Images by [tawatchai07](https://www.freepik.com/free-photo/beautiful-girl-standing-boat-looking-mountains-ratchaprapha-dam-khao-sok-national-park-surat-thani-province-thailand_13180933.htm#fromView=search&page=1&position=21&uuid=8dcae0bb-3af0-45e2-9386-99741de8513d)
+Contributions are welcome! Please open an issue or submit a pull request for any changes or enhancements.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
+
+## Acknowledgements
+
+- **React**: A JavaScript library for building user interfaces.
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+- **Firebase**: A platform developed by Google for creating mobile and web applications.
+- **Leaflet**: An open-source JavaScript library for mobile-friendly interactive maps.
+- **React-Leaflet**: React components for Leaflet maps.
+- **React-Responsive-Carousel**: A carousel component for React.
+
+## Deployment
+https://map-my-memories-three.vercel.app/signin
+
+Feel free to adjust the details, especially the Firebase setup and contact information, to match your specific project and preferences.
