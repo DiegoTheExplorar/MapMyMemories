@@ -58,8 +58,8 @@ src/
 
 1. **Clone the repository**:
    ```sh
-   git clone https://github.com/your-username/mapmymemories.git
-   cd mapmymemories
+   https://github.com/DiegoTheExplorar/MapMyMemories.git
+   cd map
    ```
 
 2. **Install dependencies**:
