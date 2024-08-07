@@ -56,8 +56,8 @@ const SignInPage = () => {
       </div>
       <div className="flex-1 flex flex-col items-center justify-center bg-gray-800 bg-opacity-90 p-6">
         <div className="text-center mb-4 text-white text-lg">
-          <p>Welcome to MapMyMemories!</p>
-          <p>Discover and remember your favorite places with ease.</p>
+          <h1>Welcome to MapMyMemories!</h1>
+          <h2>Discover and remember your favorite places with ease.</h2>
         </div>
         <button
           onClick={handleGoogleSignIn}
