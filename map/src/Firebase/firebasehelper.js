@@ -1,8 +1,9 @@
 import axios from 'axios';
+import imageCompression from 'browser-image-compression';
 import exifr from 'exifr';
 import { getAuth } from 'firebase/auth';
-import { addDoc, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { db } from './firebase-config';
 
 export const fetchImagesByLocation = async (lat, lng) => {
@@ -49,9 +50,17 @@ export const uploadImageAndFetchLocations = async (file, getCountry, fetchLocati
     const { latitude, longitude } = gpsData;
     console.log('Got coords', latitude, longitude);
 
+    const options = {
+      maxSizeMB: 1, // Maximum file size in MB
+      maxWidthOrHeight: 1920, // Max width/height the image should be resized to
+      useWebWorker: true, // Use a web worker for faster processing
+      fileType: 'image/webp' // Convert to WebP format
+    };
+    const compressedFile = await imageCompression(file, options);
+    console.log('Compressed the image');
     const storage = getStorage();
-    const storageRef = ref(storage, `images/${userId}/${file.name}`);
-    const snapshot = await uploadBytes(storageRef, file);
+    const storageRef = ref(storage, `images/${userId}/${compressedFile.name}`);
+    const snapshot = await uploadBytes(storageRef, compressedFile);
     const downloadURL = await getDownloadURL(snapshot.ref);
     console.log('Got the image URL and uploaded to storage');
 
@@ -167,5 +176,54 @@ export const fetchUserImages = async () => {
     return allImages;
   } else {
     return [];
+  }
+};
+
+export const deleteImage = async (imageUrl) => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) {
+      alert("Please sign in to delete images.");
+      return;
+  }
+  const userId = user.uid;
+
+  try {
+      // Get the reference to the image in Firebase Storage using its URL
+      const storage = getStorage();
+      const imageRef = ref(storage, imageUrl);
+
+      // Delete the image from Firebase Storage
+      await deleteObject(imageRef);
+      console.log('Image deleted from storage');
+
+      // Remove the image URL from Firestore
+      const userDocRef = doc(db, "users", userId);
+      const locationsRef = collection(userDocRef, "locations");
+      const locationDocs = await getDocs(locationsRef);
+
+      for (const docSnapshot of locationDocs.docs) {
+          const data = docSnapshot.data();
+          if (data.images && data.images.includes(imageUrl)) {
+              const locationDocRef = doc(locationsRef, docSnapshot.id);
+              await updateDoc(locationDocRef, {
+                  images: arrayRemove(imageUrl)
+              });
+              console.log(`Image URL removed from Firestore in document: ${docSnapshot.id}`);
+
+              // If the images array is empty after removal, delete the document
+              const updatedDoc = await getDoc(locationDocRef);
+              const updatedImages = updatedDoc.data().images;
+              if (updatedImages.length === 0) {
+                  await deleteDoc(locationDocRef);
+                  console.log(`Document ${docSnapshot.id} deleted because images array is empty`);
+              }
+          }
+      }
+
+      alert('Image successfully deleted!');
+  } catch (error) {
+      console.error('Error deleting image:', error);
+      alert('Failed to delete the image. Please try again.');
   }
 };

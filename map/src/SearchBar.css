@@ -1,0 +1,26 @@
+.leaflet-control-geosearch input {
+  color: black; 
+}
+
+.dark .leaflet-control-geosearch input {
+  color: black !important;
+}
+
+
+.leaflet-control-geosearch input::placeholder {
+  color: black; 
+}
+
+
+.dark .leaflet-control-geosearch input::placeholder {
+  color: black !important;
+}
+
+.leaflet-control-geosearch .results {
+  color: black; 
+}
+
+
+.dark .leaflet-control-geosearch .results {
+  color: black !important; 
+}

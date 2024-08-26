@@ -3,17 +3,17 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
+import '../SearchBar.css'; // Make sure this import is present
 
 const SearchBar = () => {
   const map = useMap();
 
   useEffect(() => {
-    // Define a red marker icon
     const redIcon = new L.Icon({
-      iconUrl: './redmarker.png', // URL to your custom icon image
-      iconSize: [32, 32], // Size of the icon
-      iconAnchor: [16, 32], // Anchor point of the icon
-      popupAnchor: [0, -32] // Popup anchor relative to the iconAnchor
+      iconUrl: './redmarker.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
     });
 
     const provider = new OpenStreetMapProvider();
@@ -25,7 +25,7 @@ const SearchBar = () => {
       showMarker: true,
       showPopup: false,
       marker: {
-        icon: redIcon, // Use the red marker icon here
+        icon: redIcon,
         draggable: false,
       },
       maxMarkers: 1,
@@ -33,10 +33,12 @@ const SearchBar = () => {
       animateZoom: true,
       autoClose: true,
       searchLabel: 'Enter address',
-      keepResult: true
+      keepResult: true,
+      className: 'search-bar', 
     });
 
     map.addControl(searchControl);
+
     return () => map.removeControl(searchControl);
   }, [map]);
 
