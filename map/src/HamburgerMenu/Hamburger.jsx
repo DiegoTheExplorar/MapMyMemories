@@ -45,7 +45,11 @@ const HamburgerMenu = ({ toggleDarkMode, isDarkMode }) => {
 
   return (
     <div>
-      <div className={`text-2xl cursor-pointer fixed top-4 right-4 transition-colors duration-300 z-[9999] ${isOpen ? 'text-white' : 'text-black dark:text-white'}`} onClick={toggleMenu}>
+      <div 
+        className={`fixed top-4 right-4 cursor-pointer transition-colors duration-300 z-[9999] ${isOpen ? 'text-white' : 'text-black dark:text-white'}`} 
+        onClick={toggleMenu}
+        style={{ fontSize: '2.5rem' }} // Adjust font size as needed
+      >
         &#9776;
       </div>
       <div className={`fixed top-0 right-0 h-full bg-gray-900 transition-width duration-500 flex flex-col justify-start pt-16 z-[9998] ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>

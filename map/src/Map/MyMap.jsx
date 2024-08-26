@@ -71,7 +71,7 @@ const MyMap = ({ isDarkMode }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-black dark:text-white">
-      <div {...getRootProps()} className="border-2 border-blue-500 p-5 text-center my-5 cursor-pointer bg-white dark:bg-gray-700 dark:text-white rounded-lg transition-colors duration-200 w-3/4 hover:bg-gray-200 dark:hover:bg-gray-600">
+      <div {...getRootProps()} className="p-5 text-center my-5 cursor-pointer bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow-md transition-colors duration-200 w-[91%] hover:bg-gray-200 dark:hover:bg-gray-600">
         <input {...getInputProps()} />
         <p>Drag 'n' drop images here, or click to select images</p>
       </div>
