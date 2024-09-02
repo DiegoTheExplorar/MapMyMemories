@@ -1,4 +1,4 @@
-# MapMyMemories
+ # MapMyMemories
 
 MapMyMemories is a web application that allows users to upload and view their photos on a map. Users can sign in using Google authentication, view photos by country, browse their image gallery, and explore photos at specific locations. The app also supports dark mode and features a responsive design.
 
@@ -12,6 +12,7 @@ MapMyMemories is a web application that allows users to upload and view their ph
 - **Dark Mode**: Toggle between light and dark mode.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 - **Search Locations**: Search for locations using the search bar on the map.
+- **Delete Images**: You can delete images from the Image Gallery page.
 
 ## Tech Stack
 
